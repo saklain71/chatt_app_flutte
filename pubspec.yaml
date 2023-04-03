@@ -34,6 +34,16 @@ dependencies:
   cupertino_icons: ^1.0.2
 #  for integrating firebase
   firebase_core: ^2.8.0
+  google_sign_in: ^6.0.2
+  firebase_auth: ^4.3.0
+  cloud_firestore: ^4.5.0
+#  for creating cash network image
+  cached_network_image: ^3.2.3
+#  for taking image
+  image_picker: ^0.8.7+1
+# for storing image
+  firebase_storage: ^11.1.0
+
 
 dev_dependencies:
   flutter_test:

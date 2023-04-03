@@ -1,3 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'package:chatt_app/api/apis.dart';
+import 'package:chatt_app/models/chat_user.dart';
+import 'package:chatt_app/screens/profile_screen.dart';
+import 'package:chatt_app/widgets/chat_user_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -9,24 +15,107 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+ // _list<ChatUser> _list = [];
+  
+  // for storing all users
+  List<ChatUser> _list = [];
+
+  // for storing searched items
+  final List<ChatUser> _searchList = [];
+  // for storing search status
+  bool _isSearching = false;
+
+  @override
+  void initState() {
+    APIs.getSelfInfo();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
           leading: const Icon(CupertinoIcons.home),
-          title: const Text("We Chat"),
+          title: _isSearching ?
+                TextField(
+                  decoration: InputDecoration(
+                    border: InputBorder.none, hintText: "Name, Email ...",),
+                  autofocus: true,
+                  style: TextStyle(
+                    fontSize: 17,
+                    letterSpacing: 0.5,
+                  ),
+                  //when search text change updated saerch list
+                  onChanged: (value){
+                    // search logic
+                    _searchList.clear();
+                    for(var i in _list){
+                      if(i.name.toLowerCase().contains(value.toLowerCase())) {
+
+                      }
+                    }
+                  },
+                )
+              : Text("We Chat"),
         actions: [
           /// search user button
-          IconButton(onPressed: (){}, icon: const Icon(Icons.search)),
+          IconButton(onPressed: (){
+            setState(() {
+              _isSearching = !_isSearching;
+            });
+          }, icon:  Icon(_isSearching? CupertinoIcons.clear_circled_solid: Icons.search)),
           /// search features button
-          IconButton(onPressed: (){}, icon: const Icon(Icons.more_vert)),
+          IconButton(onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (_)=> ProfileScreen(user: APIs.me,)));
+          }, icon: const Icon(Icons.more_vert)),
         ],
       ),
       /// floating button to add user
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: FloatingActionButton(onPressed: (){},child: const Icon(Icons.add_comment_rounded),),
+        child: FloatingActionButton(onPressed: ()async{
+         // await APIs.Api.signOut();
+         // await GoogleSignIn().signOut();
+        },child: const Icon(Icons.add_comment_rounded),),
+      ),
+      body: StreamBuilder(
+        stream: APIs.getAllUsers(),
+          builder: (context, snapshot){
+          // if data is loading
+          switch(snapshot.connectionState){
+            case ConnectionState.waiting:
+            case ConnectionState.none:
+              return const Center(child: CircularProgressIndicator());
+              // if some or all data is loaded then show it
+            case ConnectionState.active:
+            case ConnectionState.done:
+              final data = snapshot.data?.docs;
+              _list = data?.map((e) => ChatUser.fromJson(e.data())).toList() ?? [];
+
+              if(_list.isNotEmpty){
+                return ListView.builder(
+                    itemCount: _list.length ,
+                    physics: BouncingScrollPhysics(),
+                    itemBuilder: (context, index){
+                      return ChatUserCard(user: _list[index]);
+                    }
+                );
+              }else{
+                return Center(child: Text("There is no Connenctions!"));
+              }
+          }
+
+          if(snapshot.hasData){
+            final data = snapshot.data?.docs;
+            for(var i in data!){
+              log('Data ${jsonEncode(i.data())}');
+              _list.add(i.data()['about']);
+            }
+          }
+
+
+          }
       ),
     );
   }

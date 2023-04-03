@@ -1,7 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
 import 'package:chatt_app/Screens/home_screen.dart';
+import 'package:chatt_app/api/apis.dart';
+import 'package:chatt_app/helper/dialogs.dart';
 import 'package:chatt_app/main.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -12,6 +17,49 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isAnimate = false;
+
+  _handleGoogleBtnClick(){
+    Dialogs.showProgressBar(context);
+    _signInWithGoogle().then((user) async {
+      Navigator.pop(context);
+      if(user != null){}
+      log('user ${user?.user}');
+      log('user Additional info ${user?.additionalUserInfo}');
+      if((await APIs.userExists())){
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context)=>  HomeScreen()));
+      }else{
+        await APIs.creatUser().then((value) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context)=> HomeScreen()));
+        });
+      }
+    });
+  }
+
+
+  Future<UserCredential?> _signInWithGoogle() async {
+  try{
+    // internet check
+    await InternetAddress.lookup("google.com");
+  // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    // Once signed in, return the UserCredential
+    return await APIs.auth.signInWithCredential(credential);
+  }catch(e){
+    log("\n _signInWithGoogle $e");
+    Dialogs.showSnackbar(context, "Something went wrong! check internet");
+    return null;
+  }
+  }
+
 
   @override
   void initState() {
@@ -52,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
             width: mq.width * 0.9,
             child: ElevatedButton.icon(
               onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> const HomeScreen()));
+                _handleGoogleBtnClick();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,

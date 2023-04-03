@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "287353489840",
+    "firebase_url": "https://we-chat-a0eff-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "we-chat-a0eff",
     "storage_bucket": "we-chat-a0eff.appspot.com"
   },
@@ -14,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "287353489840-608ng2n5bceo5iklpsrm8l2303t3271u.apps.googleusercontent.com",
+          "client_id": "287353489840-dkm7091vd63kj1ljbjvuscu86l4ae5tk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.chatt_app",
+            "certificate_hash": "a3364746dc305c4c0f9699c4e52ddbbada903455"
+          }
+        },
+        {
+          "client_id": "287353489840-6f91bspccinduvbtu0788bnds1eg06ol.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -29,6 +38,13 @@
             {
               "client_id": "287353489840-608ng2n5bceo5iklpsrm8l2303t3271u.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "287353489840-ids5l3bj546h4da3okoj0fcn5n5u8s9p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.chattApp"
+              }
             }
           ]
         }
