@@ -30,8 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
        SystemChrome.setSystemUIOverlayStyle(
            const SystemUiOverlayStyle(
-           systemNavigationBarColor: Colors.white,
-           statusBarColor: Colors.transparent));
+             systemNavigationBarColor: Colors.white));
 
        // if (APIs.auth.currentUser != null) {
        //   log('\nUser: ${APIs.auth.currentUser}');

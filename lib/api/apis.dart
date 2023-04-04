@@ -1,15 +1,20 @@
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:chatt_app/models/chat_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class APIs{
   /// for authentication
   static FirebaseAuth auth = FirebaseAuth.instance;
   /// to create firebase coludstore
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  /// to create firebase coludstore
+  static FirebaseStorage storage = FirebaseStorage.instance;
 
   //to return current user
   static User get user => auth.currentUser!;
@@ -39,6 +44,7 @@ class APIs{
                 await creatUser().then((value) => getSelfInfo());
               }
         });
+
      //await firestore.collection('users').doc(user.uid).get().then((user) async {
       // if (user.exists) {
       //   me = ChatUser.fromJson(user.data()!);
@@ -82,21 +88,27 @@ class APIs{
   }
 
   // update profile picture of user
-  //   static Future<void> updateProfilePicture(File file) async {
-  //     //getting image file extension
-  //     final ext = file.path.split('.').last;
-  //     log('Extension: $ext');
-  //
-  //     //storage file ref with path
-  //     final ref = storage.ref().child('profile_pictures/${user.uid}.$ext');
-  //
-  //     //uploading image
-  //     await ref
-  //         .putFile(file, SettableMetadata(contentType: 'image/$ext'))
-  //         .then((p0) {
-  //       log('Data Transferred: ${p0.bytesTransferred / 1000} kb');
-  //     });
-
-
+    static Future<void> updateProfilePicture(File file) async {
+      //     //getting image file extension
+      final ext = file.path
+          .split('.')
+          .last;
+      log('Extension: $ext');
+      //storage file ref with path
+      final ref = storage.ref().child('profile_pictures/${user.uid}.$ext');
+      //uploading image
+      await ref.putFile(file, SettableMetadata(contentType: 'image/$ext'))
+          .then((p0) {
+        log('Data Transferred: ${p0.bytesTransferred / 1000} kb');
+      });
+      // uploading image in firestore database
+      me.image = await ref.getDownloadURL();
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'name': me.image,
+      });
+    }
  }
 
