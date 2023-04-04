@@ -40,7 +40,8 @@ class ChatUser {
   );
 
   Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};data["image"]= image;
+    final data = <String, dynamic>{};
+    data["image"]= image;
   data["created_id"]= createdId;
   data["about"]= about;
   data["name"]= name;

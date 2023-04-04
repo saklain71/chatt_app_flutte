@@ -30,6 +30,7 @@ class APIs{
         .get())
         .exists;
   }
+
   // for getting current user info
   static Future<void> getSelfInfo() async {
         await firestore
@@ -110,5 +111,13 @@ class APIs{
         'name': me.image,
       });
     }
+
+    ///****************** Chat Scree Related APIS *************
+  // for getting all messages from firebase database firestore
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(){
+    return firestore
+        .collection('messages')
+        .snapshots();
+  }
  }
 
