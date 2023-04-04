@@ -51,9 +51,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     // search logic
                     _searchList.clear();
                     for(var i in _list){
-                      if(i.name.toLowerCase().contains(value.toLowerCase())) {
-
+                      if(i.name.toLowerCase().contains(value.toLowerCase()) ||
+                         i.email.toLowerCase().contains(value.toLowerCase()))  {
+                        _searchList.add(i);
                       }
+                      setState(() {
+                        _searchList;
+                      });
                     }
                   },
                 )
@@ -95,10 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
               if(_list.isNotEmpty){
                 return ListView.builder(
-                    itemCount: _list.length ,
+                    itemCount: _isSearching ? _searchList.length : _list.length ,
                     physics: BouncingScrollPhysics(),
                     itemBuilder: (context, index){
-                      return ChatUserCard(user: _list[index]);
+                      return ChatUserCard(user: _isSearching ? _searchList[index]  :  _list[index]);
                     }
                 );
               }else{
