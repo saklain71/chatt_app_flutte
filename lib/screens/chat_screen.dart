@@ -19,6 +19,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   // to store all message
     List<Message> _list = [];
+    // for handing message to text changes
+    final _textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -28,35 +30,38 @@ class _ChatScreenState extends State<ChatScreen> {
           automaticallyImplyLeading: false,
           flexibleSpace: _appBar(),
         ),
+        backgroundColor: Color.fromARGB(255, 2234, 248, 255),
         body: Column(
           children: [
             Expanded(
               child: StreamBuilder(
-                  stream: APIs.getAllMessages(),
+                  stream: APIs.getAllMessages(widget.user),
                   builder: (context, snapshot){
                     // if data is loading
                     switch(snapshot.connectionState){
                       case ConnectionState.waiting:
                       case ConnectionState.none:
-                         return const Center(child: CircularProgressIndicator());
+                         return const SizedBox();
                     // if some or all data is loaded then show it
                       case ConnectionState.active:
                       case ConnectionState.done:
                          final data = snapshot.data?.docs;
-                        // _list = data?.map((e) => ChatUser.fromJson(e.data())).toList() ?? [];
+                        _list =
+                            data?.map((e) => Message.fromJson(e.data())).toList() ?? [];
+                       // log('Data ${jsonEncode(data)}');
 
-                       log('Data ${jsonEncode(data![0].data())}');
-                        if(_list.isNotEmpty){
+
+                         if(_list.isNotEmpty){
                           return ListView.builder(
                               itemCount: _list.length ,
                               physics: const BouncingScrollPhysics(),
                               itemBuilder: (context, index){
                              //  return Text("Message: ${_list[index]}");
-                                return MessageCard();
+                                return  MessageCard(message: _list[index],);
                               }
                           );
                         }else{
-                          return const Center(child: Text("Say Hi🤚",
+                          return  const Center(child: Text("Say Hi🤚",
                           style: TextStyle(fontSize: 20),));
                         }
                     }
@@ -137,7 +142,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   }, icon: const Icon(Icons.emoji_emotions, color: Colors.blueAccent,size: 25,)),
                   // Text input
-                  const Expanded(child: TextField(
+                   Expanded(child: TextField(
+                    controller: _textController,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
@@ -159,7 +165,13 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           // message send buttons
-          MaterialButton(onPressed: (){},
+          MaterialButton(onPressed: (){
+            if(_textController.text.isNotEmpty){
+              APIs.sendMessage(widget.user, _textController.text);
+              log('messegae sent ${_textController.text} ');
+              _textController.text = "";
+            }
+          },
            shape: const CircleBorder(),
             minWidth: 0,
             padding: const EdgeInsets.only(bottom: 10, right: 5, left: 10, top: 10),

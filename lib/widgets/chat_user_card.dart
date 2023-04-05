@@ -36,7 +36,7 @@ class _ChatUserCardState extends State<ChatUserCard> {
                //color: Colors.blue,
                imageUrl: widget.user.image,
                //placeholder: (context, url) => const CircularProgressIndicator(),
-               errorWidget: (context, url, error) => CircleAvatar(child: Icon(Icons.error)),
+               errorWidget: (context, url, error) => const CircleAvatar(child: Icon(Icons.error)),
              ),
            ),
 
