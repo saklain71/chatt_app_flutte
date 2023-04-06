@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,6 +8,7 @@ import 'package:chatt_app/models/message.dart';
 import 'package:chatt_app/widgets/message_card.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends StatefulWidget {
   final ChatUser user;
@@ -56,6 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Expanded(
                   child: StreamBuilder(
+
                       stream: APIs.getAllMessages(widget.user),
                       builder: (context, snapshot){
                         // if data is loading
@@ -74,6 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                              if(_list.isNotEmpty){
                               return ListView.builder(
+                                  reverse: true,
                                   itemCount: _list.length ,
                                   physics: const BouncingScrollPhysics(),
                                   itemBuilder: (context, index){
@@ -196,17 +198,33 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   }, icon: const Icon(Icons.image, color: Colors.blueAccent, size: 26,)),
                   // Pick image from camera
-                  IconButton(onPressed: (){
+                  IconButton(
+                    onPressed: () async {
+                    //take picture from camera button
+                    final ImagePicker picker = ImagePicker();
+                    // Pick an image
+                    final XFile? image = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+                    if (image != null) {
+                      log('Image Path: ${image.path}');
+                      setState(() {
 
-                  }, icon: const Icon(Icons.camera_alt_outlined, color: Colors.blueAccent, size: 26,)),
-                ],
+                      });
+                      // to update image Function
+                      await APIs.sendChatImage(widget.user,File(image.path));
+                      // for hiding bottom sheet
+                      Navigator.pop(context);
+                    }
+                  }, icon: const Icon(
+                    Icons.camera_alt_outlined,
+                       color: Colors.blueAccent, size: 26,)),
+                   ],
               ),
             ),
           ),
           // message send buttons
           MaterialButton(onPressed: (){
             if(_textController.text.isNotEmpty){
-              APIs.sendMessage(widget.user, _textController.text);
+              APIs.sendMessage(widget.user, _textController.text, Type.text);
               log('messegae sent ${_textController.text} ');
               _textController.text = "";
             }

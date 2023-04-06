@@ -55,7 +55,15 @@ class _ChatUserCardState extends State<ChatUserCard> {
               ),
 
               title: Text(widget.user.name),
-              subtitle: Text(_message != null ? _message!.msg : widget.user.about),
+              subtitle: Text(
+                  _message != null ?
+                      _message!.type == Type.image ?
+                          "📸"
+                          : _message!.msg
+                          : widget.user.about,
+                maxLines: 1,
+
+              ),
               // trailing: Text("${DateTime.now().hour}:${DateTime.now().minute}",
               // style: TextStyle(color: Colors.black54),),
 

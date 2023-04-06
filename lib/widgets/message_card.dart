@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatt_app/api/apis.dart';
 import 'package:chatt_app/helper/my_date_util.dart';
 import 'package:chatt_app/main.dart';
@@ -34,7 +35,7 @@ class _MessageCardState extends State<MessageCard> {
       children: [
         Flexible(
           child: Container(
-            padding: EdgeInsets.all(mq.width * 0.04),
+            padding: EdgeInsets.all(widget.message.type == Type.image ? mq.width * 0.02 : mq.width * 0.04),
             decoration:  BoxDecoration(
                color:   const Color.fromARGB(225, 221, 245, 255),
               border: Border.all(color: Colors.blueAccent),
@@ -45,7 +46,26 @@ class _MessageCardState extends State<MessageCard> {
               ),
             ),
             margin: EdgeInsets.symmetric(horizontal: mq.width * 0.04, vertical: mq.height * 0.01),
-            child: Text(widget.message.msg, style: const TextStyle(fontSize: 15, color: Colors.black87),),
+            child:  widget.message.type == Type.text ?
+            Text(
+              widget.message.msg,
+              style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87),) :
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: CachedNetworkImage(
+                  // height: mq.height * 0.4,
+                  // width: mq.height * 0.4,
+                  //color: Colors.blue,
+                  imageUrl: widget.message.msg,
+                  placeholder: (context, url) =>
+                  const CircularProgressIndicator(
+                    strokeWidth: 1,
+                  ),
+                  errorWidget: (context, url, error) =>
+                  const Icon (Icons.image,size: 70,)),
+            ),
           ),
         ),
         // Show Time
@@ -88,7 +108,7 @@ class _MessageCardState extends State<MessageCard> {
         ),
         Flexible(
           child: Container(
-            padding: EdgeInsets.all(mq.width * 0.04),
+            padding: EdgeInsets.all(widget.message.type == Type.image ? mq.width * 0.03 : mq.width * 0.04,),
             decoration:  BoxDecoration(
                 color: const Color.fromARGB(225, 218, 255, 276),
                 border: Border.all(color: Colors.lightGreen),
@@ -99,10 +119,29 @@ class _MessageCardState extends State<MessageCard> {
                 ),
             ),
             margin: EdgeInsets.symmetric(horizontal: mq.width * 0.04, vertical: mq.height * 0.01),
-            child: Text(widget.message.msg, style: const TextStyle(fontSize: 15, color: Colors.black87),),
+            child:
+                widget.message.type == Type.text ?
+                Text(
+              widget.message.msg,
+              style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87),) :
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: CachedNetworkImage(
+                    // height: mq.height * 0.4,
+                    // width: mq.height * 0.4,
+                    //color: Colors.blue,
+                    imageUrl: widget.message.msg,
+                    placeholder: (context, url) =>
+                    const CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
+                    errorWidget: (context, url, error) =>
+                      const Icon (Icons.image,size: 70,)),
+                  ),
+                ),
           ),
-        ),
-
       ],
     );
   }
