@@ -43,7 +43,8 @@ dependencies:
   image_picker: ^0.8.7+1
 # for storing image
   firebase_storage: ^11.1.0
-
+# for sharing Emojis
+  emoji_picker_flutter: ^1.5.2
 
 dev_dependencies:
   flutter_test:

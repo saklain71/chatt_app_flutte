@@ -126,7 +126,9 @@ class APIs{
 
   // for getting all messages from firebase database firestore
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(ChatUser user){
-    return firestore.collection('chats/${getConversationID(user.id)}/messages/').snapshots();
+    return firestore
+        .collection('chats/${getConversationID(user.id)}/messages/')
+        .snapshots();
   }
   // for sending message
   static Future<void> sendMessage(ChatUser chatUser, String msg) async{
@@ -145,6 +147,14 @@ class APIs{
         .update({'read': DateTime.now().millisecondsSinceEpoch.toString()});
   }
 
+   // get only last message for specific call
+ static Stream<QuerySnapshot<Map<String,dynamic>>> getLastMessage(ChatUser user){
+    return  firestore
+        .collection('chats/${getConversationID(user.id)}/messages/')
+        .orderBy('sent',descending: true)
+        .limit(1)
+        .snapshots();
+ }
 
 }
 
