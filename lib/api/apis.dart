@@ -116,6 +116,24 @@ class APIs{
       });
     }
 
+  // for getting specific user info
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getUserInfo(
+      ChatUser chatUser) {
+    return firestore
+        .collection('users')
+        .where('id', isEqualTo: chatUser.id)
+        .snapshots();
+  }
+
+  // update online or last active status of user
+  static Future<void> updateActiveStatus(bool isOnline) async {
+    firestore.collection('users').doc(user.uid).update({
+      'is_online': isOnline,
+      'last_active': DateTime.now().millisecondsSinceEpoch.toString(),
+      'push_token': me.pushToken,
+    });
+  }
+
     ///****************** Chat Scree Related APIS *************
 
 

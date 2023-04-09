@@ -52,16 +52,17 @@ class _MessageCardState extends State<MessageCard> {
               style: const TextStyle(
                   fontSize: 15,
                   color: Colors.black87),) :
+                // show image
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: CachedNetworkImage(
-                  // height: mq.height * 0.4,
-                  // width: mq.height * 0.4,
-                  //color: Colors.blue,
                   imageUrl: widget.message.msg,
                   placeholder: (context, url) =>
-                  const CircularProgressIndicator(
-                    strokeWidth: 1,
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
                   ),
                   errorWidget: (context, url, error) =>
                   const Icon (Icons.image,size: 70,)),
