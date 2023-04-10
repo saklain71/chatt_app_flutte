@@ -1,4 +1,4 @@
-
+// ignore_for_file: use_build_synchronously
 import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,9 +11,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'auth/login_screen.dart';
 
+// profile screen -- to show in user info
 class ProfileScreen extends StatefulWidget {
   final ChatUser user;
   const ProfileScreen({Key? key, required this.user}) : super(key: key);
@@ -44,26 +44,23 @@ class _HomeScreenState extends State<ProfileScreen> {
             //for showing progress dialog
             Dialogs.showProgressBar(context);
 
-           // await APIs.updateActiveStatus(false);
+            await APIs.updateActiveStatus(false);
 
             //sign out from app
-            // await APIs.auth.signOut().then((value) async {
-            //   await GoogleSignIn().signOut().then((value) {
-            //     //for hiding progress dialog
-            //     Navigator.pop(context);
-            //
-            //     //for moving to home screen
-            //     Navigator.pop(context);
-            //
-            //     APIs.auth = FirebaseAuth.instance;
-            //
-            //     //replacing home screen with login screen
-            //     Navigator.pushReplacement(
-            //         context,
-            //         MaterialPageRoute(
-            //             builder: (_) => const LoginScreen()));
-            //   });
-            // });
+            await APIs.auth.signOut().then((value) async {
+              await GoogleSignIn().signOut().then((value) {
+                //for hiding progress dialog
+                Navigator.pop(context);
+                //for moving to home screen
+                Navigator.pop(context);
+                APIs.auth = FirebaseAuth.instance;
+                //replacing home screen with login screen
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const LoginScreen()));
+              });
+            });
 
           },icon: const Icon(Icons.add_comment_rounded),
             label: const Text("Logout"),),

@@ -6,6 +6,7 @@ import 'package:chatt_app/helper/my_date_util.dart';
 import 'package:chatt_app/main.dart';
 import 'package:chatt_app/models/chat_user.dart';
 import 'package:chatt_app/models/message.dart';
+import 'package:chatt_app/screens/view_profile_screen.dart';
 import 'package:chatt_app/widgets/message_card.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -125,7 +126,9 @@ class _ChatScreenState extends State<ChatScreen> {
   // app bar widget
   Widget _appBar(){
     return  InkWell(
-      onTap: (){},
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ViewProfileScreen(user: widget.user) ));
+      },
       child: StreamBuilder(
         stream: APIs.getUserInfo(widget.user),
         builder: (context, snapshot) {

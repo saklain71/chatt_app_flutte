@@ -33,7 +33,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
 #  for integrating firebase
-  firebase_core: ^2.8.0
+  firebase_core: ^2.9.0
   google_sign_in: ^6.0.2
   firebase_auth: ^4.3.0
   cloud_firestore: ^4.5.0
@@ -45,6 +45,9 @@ dependencies:
   firebase_storage: ^11.1.0
 # for sharing Emojis
   emoji_picker_flutter: ^1.5.2
+#  firebase messaging
+  firebase_messaging: ^14.4.0
+
 
 dev_dependencies:
   flutter_test:

@@ -1,11 +1,10 @@
-
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:chatt_app/models/chat_user.dart';
 import 'package:chatt_app/models/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class APIs{
@@ -22,7 +21,20 @@ class APIs{
   /// for storing self information
   static late ChatUser me;
 
+  /// for accessing firebase message(Push Notification)
+  static FirebaseMessaging fMessaging = FirebaseMessaging.instance;
 
+  // for getting firebase token
+  static Future<void> getFirebaseMessagingToken() async{
+    await fMessaging.requestPermission();
+
+    await fMessaging.getToken().then((token) {
+      if(token != null){
+        me.pushToken = token;
+        log('Push Token $token');
+      }
+    });
+  }
 
   // for checking if user exists or not?
   static Future<bool> userExists() async {
@@ -42,11 +54,17 @@ class APIs{
             .then((user) async {
               if(user.exists){
                 me = ChatUser.fromJson(user.data()!);
+                 await getFirebaseMessagingToken();
+                // for starting user starts to active
+                APIs.updateActiveStatus(true);
                 log('My Data: ${user.data()}');
               }else{
                 await creatUser().then((value) => getSelfInfo());
               }
         });
+
+
+
 
      //await firestore.collection('users').doc(user.uid).get().then((user) async {
       // if (user.exists) {
@@ -134,9 +152,7 @@ class APIs{
     });
   }
 
-    ///****************** Chat Scree Related APIS *************
-
-
+  /// ****************** Chat Scree Related APIS *************
   // chats (collection) --> conversation_id (doc) --> messages (collection) --> message (doc)
 
   // useful for getting conversation id

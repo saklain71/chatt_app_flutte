@@ -8,6 +8,8 @@ import 'package:chatt_app/models/message.dart';
 import 'package:chatt_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'dialogs/profile_dialog.dart';
+
 class ChatUserCard extends StatefulWidget {
 
   final ChatUser user;
@@ -42,15 +44,20 @@ class _ChatUserCardState extends State<ChatUserCard> {
             }
             return ListTile(
               // leading: CircleAvatar(child: Icon(CupertinoIcons.person),),
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(mq.height * 0.3),
-                child: CachedNetworkImage(
-                  height: mq.height * 0.055,
-                  width: mq.height * 0.055,
-                  //color: Colors.blue,
-                  imageUrl: widget.user.image,
-                  //placeholder: (context, url) => const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => const CircleAvatar(child: Icon(Icons.error)),
+              leading: InkWell(
+                onTap: (){
+                  showDialog(context: context, builder: (_)=>  ProfileDialog(user: widget.user,));
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(mq.height * 0.3),
+                  child: CachedNetworkImage(
+                    height: mq.height * 0.055,
+                    width: mq.height * 0.055,
+                    //color: Colors.blue,
+                    imageUrl: widget.user.image,
+                    //placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const CircleAvatar(child: Icon(Icons.error)),
+                  ),
                 ),
               ),
 
