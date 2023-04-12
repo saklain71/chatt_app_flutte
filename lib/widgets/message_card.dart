@@ -2,10 +2,13 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatt_app/api/apis.dart';
+import 'package:chatt_app/helper/dialogs.dart';
 import 'package:chatt_app/helper/my_date_util.dart';
 import 'package:chatt_app/main.dart';
 import 'package:chatt_app/models/message.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 
 // for showing single message details
 class MessageCard extends StatefulWidget {
@@ -19,8 +22,15 @@ class MessageCard extends StatefulWidget {
 class _MessageCardState extends State<MessageCard> {
   @override
   Widget build(BuildContext context) {
-    return APIs.user.uid == widget.message.fromId?
-        _greenMessage() :_blueMessage();
+    bool isMe = APIs.user.uid == widget.message.fromId;
+    return InkWell(
+        onLongPress: (){
+          _showBottomSheet(isMe);
+        },
+        child: isMe
+        ? _greenMessage()
+        :_blueMessage());
+
   }
 
 // sender or another user message
@@ -146,4 +156,154 @@ class _MessageCardState extends State<MessageCard> {
       ],
     );
   }
+
+  // bottom sheet for modiying message details
+  void _showBottomSheet(bool isMe) {
+    showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        builder: (_) {
+          return ListView(
+            shrinkWrap: true,
+            children: [
+              Container(
+                height: 4,
+                margin: EdgeInsets.symmetric(
+                  vertical: mq.height * 0.015,
+                  horizontal: mq.width * 0.37,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[500],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+              ),
+
+              // Copy Option
+              widget.message.type == Type.text
+                  ? _OptionItem(
+                  icon: const Icon(
+                    Icons.copy_all_outlined,
+                    color: Colors.blue,
+                    size: 26,),
+                  text: "Copy Text",
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(text :widget.message.msg));
+                    // for hiding bottom sheet
+                    Navigator.pop(context);
+                    Dialogs.showSnackbar(context, "Text Copied");
+
+                  })
+                  // Save Image
+                  : _OptionItem(
+                  icon: const Icon(
+                    Icons.download_rounded,
+                    color: Colors.blue,
+                    size: 26,),
+                  text: "Save Image",
+                  onTap: () async {
+                    try{
+                      log('image Url: ${widget.message.msg}');
+                      await GallerySaver.saveImage(widget.message.msg,
+                          albumName: "We Chat")
+                          .then((success) {
+                        // for hiding bottom sheet
+                        Navigator.pop(context);
+                        if(success != null && success) {
+                          Dialogs.showSnackbar(context, "Image Saved on Gallery");
+                        }
+                      });
+                    }
+                    catch(e){
+                      log('Error While Saving $e');
+                    }
+                  }),
+              // Separator or devider
+              Divider(
+                color: Colors.black54,
+                endIndent: mq.width * 04,
+                indent: mq.height * 0.4,
+              ),//
+              // Edit  option
+              if(widget.message.type == Type.text && isMe)
+              _OptionItem(
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                    size: 26,),
+                  text: "Edit Message",
+                  onTap: (){}),
+
+              // Delete Option
+              if(isMe)
+              _OptionItem(
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.blue,
+                    size: 26,),
+                  text: "Delete Message",
+                  onTap: () async {
+                    await APIs.deleteMessage(widget.message).then((value) {
+                      Navigator.pop(context);
+                    });
+                  }),
+              // Separator or devider
+              Divider(
+                color: Colors.black54,
+                endIndent: mq.width * 04,
+                indent: mq.height * 0.4,
+              ),//
+
+              // Sent Option
+              _OptionItem(
+                  icon: const Icon(Icons.remove_red_eye, color: Colors.blue, size: 26,),
+                  text: "Sent At: ${MyDateUtil.getMessageTime(context: context, time: widget.message.sent)}",
+                  onTap: (){}),
+
+              // Read Option
+              _OptionItem(
+                  icon: const Icon(Icons.remove_red_eye, color: Colors.red, size: 26,),
+                  text: widget.message.read.isEmpty
+                      ? "Read At: Not Seen Yet"
+                      : "Read At:  ${MyDateUtil.getMessageTime(context: context, time: widget.message.read)}",
+                  onTap: (){}),
+            ],
+          );
+        });
+  }
 }
+
+class _OptionItem extends StatelessWidget {
+  final Icon icon;
+  final String text;
+  final  VoidCallback onTap;
+  const _OptionItem({required this.icon, required this.text, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: (){
+        onTap();
+      },child: Padding(
+        padding:  EdgeInsets.only(
+          left: mq.width * 0.05,
+          top: mq.height * 0.015,
+          bottom: mq.height * 0.015,
+        ),
+        child: Row(
+        children: [
+          icon,
+          SizedBox(width: mq.width * 0.04,),
+          Text(text,style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black54,
+            letterSpacing: 0.5
+          )),
+        ],
+    ),
+      ),
+    );
+  }
+}
+
