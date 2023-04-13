@@ -164,7 +164,7 @@ class _MessageCardState extends State<MessageCard> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-        builder: (_) {
+        builder: (context) {
           return ListView(
             shrinkWrap: true,
             children: [
@@ -224,7 +224,8 @@ class _MessageCardState extends State<MessageCard> {
                 color: Colors.black54,
                 endIndent: mq.width * 04,
                 indent: mq.height * 0.4,
-              ),//
+              ),
+
               // Edit  option
               if(widget.message.type == Type.text && isMe)
               _OptionItem(
@@ -233,7 +234,12 @@ class _MessageCardState extends State<MessageCard> {
                     color: Colors.blue,
                     size: 26,),
                   text: "Edit Message",
-                  onTap: (){}),
+                  onTap: (){
+                    // hide the current bottom sheet
+                     Navigator.pop(context);
+                    _showMessageUpdateDialog();
+
+                  }),
 
               // Delete Option
               if(isMe)
@@ -245,7 +251,7 @@ class _MessageCardState extends State<MessageCard> {
                   text: "Delete Message",
                   onTap: () async {
                     await APIs.deleteMessage(widget.message).then((value) {
-                      Navigator.pop(context);
+
                     });
                   }),
               // Separator or devider
@@ -272,6 +278,67 @@ class _MessageCardState extends State<MessageCard> {
           );
         });
   }
+  // dialog for updating message content
+ void _showMessageUpdateDialog(){
+   String updatedMsg = widget.message.msg;
+
+   showDialog(
+       context: context,
+       builder: (_) => AlertDialog(
+         contentPadding: const EdgeInsets.only(
+             left: 24, right: 24, top: 20, bottom: 10),
+         shape: RoundedRectangleBorder(
+             borderRadius: BorderRadius.circular(20)),
+
+         //title
+         title: const Row(
+           children: [
+             Icon(
+               Icons.message,
+               color: Colors.blue,
+               size: 28,
+             ),
+             Text('Update Message')
+           ],
+         ),
+
+         //content
+         content: TextFormField(
+           initialValue: updatedMsg,
+           maxLines: null,
+           onChanged: (value) => updatedMsg = value,
+           decoration: InputDecoration(
+               border: OutlineInputBorder(
+                   borderRadius: BorderRadius.circular(15))),
+         ),
+
+         //actions
+         actions: [
+           //cancel button
+           MaterialButton(
+               onPressed: () {
+                 //hide alert dialog
+                 Navigator.pop(context);
+               },
+               child: const Text(
+                 'Cancel',
+                 style: TextStyle(color: Colors.blue, fontSize: 16),
+               )),
+
+           //update button
+           MaterialButton(
+               onPressed: () {
+                 //hide alert dialog
+                 Navigator.pop(context);
+                 APIs.updateMessage(widget.message, updatedMsg);
+               },
+               child: const Text(
+                 'Update',
+                 style: TextStyle(color: Colors.blue, fontSize: 16),
+               ))
+         ],
+       ));
+ }
 }
 
 class _OptionItem extends StatelessWidget {
