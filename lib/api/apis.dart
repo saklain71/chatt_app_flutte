@@ -111,6 +111,7 @@ class APIs {
   //     return false;
   //   }
   // }
+
   //add new email
   static Future<bool> addChatUser(String email) async {
     final data = await firestore
@@ -206,7 +207,7 @@ class APIs {
     log('\nUserIds: $userIds');
 
     return firestore
-        .collection('usersNew')
+        .collection('users')
         .where('id',
         whereIn: userIds.isEmpty
             ? ['']
